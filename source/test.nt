@@ -1,0 +1,96 @@
+import {
+  noa.suite {noa},
+  this.path {clean, drop-last, is-absolute, is-relative, split-extension, take-last},
+  this.path.gen {paths},
+}
+
+define main(): unit {
+  noa::check(
+    "∀ (p: path). clean(clean(p)) == clean(p)",
+    paths,
+    function (p) {
+      pin p = p in
+      pin p1 = clean(p) in
+      pin p2 = clean(p1) in
+      eq-text(p1, p2)
+    },
+  );
+  noa::check(
+    "∀ (p: path). is-absolute(p) <=> not(is-relative(p))",
+    paths,
+    function (p) {
+      pin p = p in
+      if is-absolute(p) {
+        not(is-relative(p))
+      } else {
+        is-relative(p)
+      }
+    },
+  );
+  noa::check(
+    "∀ (p: path). is-relative(p) <=> not(is-absolute(p))",
+    paths,
+    function (p) {
+      pin p = p in
+      if is-relative(p) {
+        not(is-absolute(p))
+      } else {
+        is-absolute(p)
+      }
+    },
+  );
+  noa::check(
+    "∀ (p: path). is-absolute(p) <=> is-absolute(clean(p))",
+    paths,
+    function (p) {
+      pin p = p in
+      if is-absolute(p) {
+        pin p' = clean(p) in
+        is-absolute(p')
+      } else {
+        pin p' = clean(p) in
+        not(is-absolute(p'))
+      }
+    },
+  );
+  noa::check(
+    "∀ (p: path). is-relative(p) <=> is-relative(clean(p))",
+    paths,
+    function (p) {
+      pin p = p in
+      if is-relative(p) {
+        pin p' = clean(p) in
+        is-relative(p')
+      } else {
+        pin p' = clean(p) in
+        not(is-relative(p'))
+      }
+    },
+  );
+  noa::check(
+    "∀ (p: path). append(drop-last(p), take-last(p)) == clean(p)",
+    paths,
+    function (p) {
+      pin p = p in
+      pin dir = drop-last(p) in
+      pin base = take-last(p) in
+      pin p' = this.path.append(dir, base) in
+      pin p1 = clean(p) in
+      eq-text(p1, p')
+    },
+  );
+  noa::check(
+    "∀ (p: path). let Pair(base, ext) = split-extension(p) in clean(text-append(base, ext)) == clean(p)",
+    paths,
+    function (p) {
+      pin p = p in
+      let Pair(init, last) = split-extension(p) in
+      pin init = init in
+      pin last = last in
+      pin p' = core.text.append(init, last) in
+      pin p1 = clean(p) in
+      pin p2 = clean(p') in
+      eq-text(p1, p2)
+    },
+  );
+}

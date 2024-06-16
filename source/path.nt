@@ -1,0 +1,172 @@
+import {
+  core.list {filter},
+  core.text {
+    drop-end-N,
+    drop-end-while-N,
+    intercalate,
+    split,
+    take-N,
+    take-end-N,
+    take-end-while-N,
+  },
+  core.text.eq {eq-suffix},
+}
+
+constant separator-rune: rune {
+  `/`
+}
+
+constant separator: &text {
+  introspect os {
+  | linux =>
+    "/"
+  | darwin =>
+    "/"
+  }
+}
+
+define is-absolute(path: &text): bool {
+  pin head = take-N(path, 1) in
+  eq-text(head, separator)
+}
+
+define is-relative(path: &text): bool {
+  not(is-absolute(path))
+}
+
+define _clean-double-dots(components: list(text), acc: list(text)): list(text) {
+  match components {
+  | Nil =>
+    reverse(acc)
+  | Cons(c, cs) =>
+    let b on c = eq-text(c, "..") in
+    if b {
+      match acc {
+      | Nil =>
+        _clean-double-dots(cs, [])
+      | Cons(_, acc-rest) =>
+        _clean-double-dots(cs, acc-rest)
+      }
+    } else {
+      _clean-double-dots(cs, Cons(c, acc))
+    }
+  }
+}
+
+define clean(path: &text): text {
+  let components = split(path, separator) in
+  let components' =
+    filter(components, function (component) {
+      all([
+        not(eq-text(component, "")),
+        not(eq-text(component, ".")),
+      ])
+    })
+  in
+  let components' = _clean-double-dots(components', []) in
+  if is-absolute(path) {
+    let len on components' = length(components') in
+    if eq-int(len, 0) {
+      *separator
+    } else {
+      intercalate(Cons(*"", components'), *separator)
+    }
+  } else {
+    intercalate(components', *separator)
+  }
+}
+
+define append(path1: &text, path2: &text): text {
+  if eq-text(path1, "") {
+    *path2
+  } else {
+    pin tmp = core.text.join-N([path1, separator, path2]) in
+    clean(tmp)
+  }
+}
+
+define take-last(path: &text): text {
+  // take-last("foo/") => ""
+  // take-last("foo/bar") => "bar"
+  // take-last("foobar") => "foobar"
+  // take-last("root/foo/") => ""
+  // take-last("root/foo/bar") => "bar"
+  pin tmp =
+    take-end-while-N(path, function (r) {
+      ne-rune(r, separator-rune)
+    })
+  in
+  clean(tmp)
+}
+
+define drop-last(path: &text): text {
+  // drop-last("foo/") => "foo"
+  // drop-last("foo/bar") => "foo"
+  // drop-last("foobar") => ""
+  // drop-last("root/foo/") => "root/foo"
+  // drop-last("root/foo/bar") => "root/foo"
+  pin tmp =
+    drop-end-while-N(path, function (r) {
+      ne-rune(r, separator-rune)
+    })
+  in
+  clean(tmp)
+}
+
+define _split-extension(path: &text, pivot: int): pair(text, text) {
+  pin file = drop-end-N(path, pivot) in
+  let ext = take-end-N(path, pivot) in
+  if or(eq-suffix(file, "."), eq-suffix(file, "/")) {
+    Pair(clean(path), *"")
+  } else {
+    Pair(clean(file), ext)
+  }
+}
+
+define split-extension(path: &text): pair(text, text) {
+  let dot-pos-or-none =
+    core.text.find-end(path, function (r) {
+      eq-rune(r, `.`)
+    })
+  in
+  let slash-pos-or-none =
+    core.text.find-end(path, function (r) {
+      eq-rune(r, `/`)
+    })
+  in
+  match dot-pos-or-none {
+  | Left(_) =>
+    Pair(clean(path), *"")
+  | Right(dot-pos) =>
+    match slash-pos-or-none {
+    | Left(_) =>
+      _split-extension(path, add-int(dot-pos, 1))
+    | Right(slash-pos) =>
+      if lt-int(slash-pos, dot-pos) {
+        Pair(clean(path), *"")
+      } else {
+        _split-extension(path, add-int(dot-pos, 1))
+      }
+    }
+  }
+}
+
+define zen(): unit {
+  let p = "/Users/foo/Downloads/sample" in
+  let Pair(file, ext) = split-extension(p) in
+  printf("file: {}\n", [file]);
+  printf("ext: {}\n", [ext]);
+  printf("result: {}\n", [clean("foo/./bar//../buz.txt")]);
+  printf("result: {}\n", [take-last("/foo/./foo.txt")]);
+  printf("result: {}\n", [drop-last("foo/bar.txt")]);
+  printf("result: {}\n", [drop-last("/root/foo/.//item.txt")]);
+  printf("result: {}\n", [drop-last("///")]);
+  printf("result: {}\n", [this.path.append("test/sample", "foo.txt")]);
+  printf("result: {}\n", [this.path.append("test/sample/", "foo.txt")]);
+  printf("result: {}\n", [this.path.append("test/sample", "/foo.txt")]);
+  printf("result: {}\n", [this.path.append("test/.//sample/", "/foo.txt")]);
+  pin result = this.path.append("test/.//sample/", "/foo.txt") in
+  let init = drop-last(result) in
+  let last = take-last(result) in
+  printf("directory: {}\ntake-last: {}\n", [init, last])
+}

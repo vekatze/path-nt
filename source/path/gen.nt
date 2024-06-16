@@ -1,0 +1,53 @@
+import {
+  core.list {filter},
+  core.text {intercalate, split},
+  core.text.show,
+  noa.gen {Gen, gen},
+  noa.gen.custom.texts {Config, texts},
+  noa.gen.lists {lists},
+  this.path {separator},
+}
+
+constant path-components: gen(list(text)) {
+  lists(
+    texts(
+      Config of {
+        min-length = 0,
+        max-length = none(),
+        rune-generator = none(),
+        rune-acceptor = {
+          function (r) {
+            and(ne-rune(r, `/`), ne-rune(r, `\0`))
+          }
+        },
+      },
+    ),
+  )
+}
+
+constant paths: gen(text) {
+  Gen of {
+    generate = {
+      function (size) {
+        let xs = path-components::generate(size) in
+        intercalate(xs, *separator)
+      }
+    },
+    shrink = {
+      function (path) {
+        pin path = path in
+        let components = split(path, separator) in
+        let components-list = path-components::shrink(components) in
+        let cands =
+          for-each(components-list, function (components) {
+            intercalate(components, *separator)
+          })
+        in
+        filter(cands, function (cand) {
+          ne-text(path, cand)
+        })
+      }
+    },
+    viewer = core.text.show.as-show,
+  }
+}
