@@ -92,5 +92,5 @@ define main(): unit {
       pin p2 = clean(p') in
       eq-text(p1, p2)
     },
-  );
+  )
 }
