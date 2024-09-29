@@ -1,0 +1,10 @@
+import {
+  this.entity.dtype {dtype},
+}
+
+data dirent {
+| Dirent(
+    kind: dtype,
+    name: text,
+  )
+}

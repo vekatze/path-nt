@@ -1,0 +1,42 @@
+import {
+  this.foreign {
+    _DT_BLK,
+    _DT_CHR,
+    _DT_DIR,
+    _DT_FIFO,
+    _DT_LNK,
+    _DT_REG,
+    _DT_SOCK,
+  },
+}
+
+data dtype {
+| DT_BLK
+| DT_CHR
+| DT_DIR
+| DT_FIFO
+| DT_LNK
+| DT_REG
+| DT_SOCK
+| DT_UNKNOWN
+}
+
+define dtype-from-int(i: int8): dtype {
+  if eq-int8(i, _DT_REG) {
+    DT_REG
+  } else-if eq-int8(i, _DT_DIR) {
+    DT_DIR
+  } else-if eq-int8(i, _DT_BLK) {
+    DT_BLK
+  } else-if eq-int8(i, _DT_CHR) {
+    DT_CHR
+  } else-if eq-int8(i, _DT_FIFO) {
+    DT_FIFO
+  } else-if eq-int8(i, _DT_LNK) {
+    DT_LNK
+  } else-if eq-int8(i, _DT_SOCK) {
+    DT_SOCK
+  } else {
+    DT_UNKNOWN
+  }
+}

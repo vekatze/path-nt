@@ -3,7 +3,9 @@ import {
   core.control {discard},
   core.errno {get-error-message, report-system-error, system},
   core.magic,
-  core.text {format},
+  this.entity.dirent {Dirent, dirent},
+  this.entity.dirent.show {show-dirent},
+  this.entity.dtype {dtype-from-int},
   this.path {drop-last},
 }
 
@@ -14,47 +16,9 @@ foreign {
   closedir(pointer): int,
   neut_path_v0_1_GET_DNAME(pointer): pointer,
   neut_path_v0_1_GET_DTYPE(pointer): int,
-  neut_path_v0_1_DT_BLK(): int8,
-  neut_path_v0_1_DT_CHR(): int8,
-  neut_path_v0_1_DT_DIR(): int8,
-  neut_path_v0_1_DT_FIFO(): int8,
-  neut_path_v0_1_DT_LNK(): int8,
-  neut_path_v0_1_DT_REG(): int8,
-  neut_path_v0_1_DT_SOCK(): int8,
-  neut_path_v0_1_DT_UNKNOWN(): int8,
 }
 
-constant _DT_BLK: int8 {
-  magic external neut_path_v0_1_DT_BLK()
-}
-
-constant _DT_CHR: int8 {
-  magic external neut_path_v0_1_DT_CHR()
-}
-
-constant _DT_DIR: int8 {
-  magic external neut_path_v0_1_DT_DIR()
-}
-
-constant _DT_FIFO: int8 {
-  magic external neut_path_v0_1_DT_FIFO()
-}
-
-constant _DT_LNK: int8 {
-  magic external neut_path_v0_1_DT_LNK()
-}
-
-constant _DT_REG: int8 {
-  magic external neut_path_v0_1_DT_REG()
-}
-
-constant _DT_SOCK: int8 {
-  magic external neut_path_v0_1_DT_SOCK()
-}
-
-constant _DT_UNKNOWN: int8 {
-  magic external neut_path_v0_1_DT_UNKNOWN()
-}
+data _directory {}
 
 define get-current-directory(): system(text) {
   let zero: int = 0 in
@@ -63,56 +27,6 @@ define get-current-directory(): system(text) {
     report-system-error()
   } else {
     Right(from-c-string(core.magic.cast(int, &c-string, result)))
-  }
-}
-
-data _directory {}
-
-data dtype {
-| DT_BLK
-| DT_CHR
-| DT_DIR
-| DT_FIFO
-| DT_LNK
-| DT_REG
-| DT_SOCK
-| DT_UNKNOWN
-}
-
-define _read-dtype(i: int8): dtype {
-  if eq-int8(i, _DT_REG) {
-    DT_REG
-  } else-if eq-int8(i, _DT_DIR) {
-    DT_DIR
-  } else-if eq-int8(i, _DT_BLK) {
-    DT_BLK
-  } else-if eq-int8(i, _DT_CHR) {
-    DT_CHR
-  } else-if eq-int8(i, _DT_FIFO) {
-    DT_FIFO
-  } else-if eq-int8(i, _DT_LNK) {
-    DT_LNK
-  } else-if eq-int8(i, _DT_SOCK) {
-    DT_SOCK
-  } else {
-    DT_UNKNOWN
-  }
-}
-
-data dirent {
-| Dirent(
-    kind: dtype,
-    name: text,
-  )
-}
-
-define show-dirent(e: dirent): text {
-  let Dirent of {kind, name} = e in
-  match kind {
-  | DT_DIR =>
-    format("{}/", [name])
-  | _ =>
-    format("{}", [name])
   }
 }
 
@@ -133,7 +47,7 @@ define _read-directory(d: _directory): list(dirent) {
     []
   } else {
     let name = from-c-string(magic external neut_path_v0_1_GET_DNAME(result)) in
-    let kind = _read-dtype(magic external neut_path_v0_1_GET_DTYPE(result)) in
+    let kind = dtype-from-int(magic external neut_path_v0_1_GET_DTYPE(result)) in
     Cons(Dirent of {kind, name}, _read-directory(d))
   }
 }

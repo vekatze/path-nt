@@ -1,0 +1,15 @@
+import {
+  core.text {format},
+  this.entity.dirent {Dirent, dirent},
+  this.entity.dtype {DT_DIR},
+}
+
+define show-dirent(e: dirent): text {
+  let Dirent of {kind, name} = e in
+  match kind {
+  | DT_DIR =>
+    format("{}/", [name])
+  | _ =>
+    format("{}", [name])
+  }
+}

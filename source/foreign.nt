@@ -1,0 +1,48 @@
+foreign {
+  getcwd(pointer, int): pointer,
+  opendir(pointer): pointer,
+  readdir(pointer): pointer,
+  closedir(pointer): int,
+  neut_path_v0_1_GET_DNAME(pointer): pointer,
+  neut_path_v0_1_GET_DTYPE(pointer): int,
+  neut_path_v0_1_DT_BLK(): int8,
+  neut_path_v0_1_DT_CHR(): int8,
+  neut_path_v0_1_DT_DIR(): int8,
+  neut_path_v0_1_DT_FIFO(): int8,
+  neut_path_v0_1_DT_LNK(): int8,
+  neut_path_v0_1_DT_REG(): int8,
+  neut_path_v0_1_DT_SOCK(): int8,
+  neut_path_v0_1_DT_UNKNOWN(): int8,
+}
+
+constant _DT_BLK: int8 {
+  magic external neut_path_v0_1_DT_BLK()
+}
+
+constant _DT_CHR: int8 {
+  magic external neut_path_v0_1_DT_CHR()
+}
+
+constant _DT_DIR: int8 {
+  magic external neut_path_v0_1_DT_DIR()
+}
+
+constant _DT_FIFO: int8 {
+  magic external neut_path_v0_1_DT_FIFO()
+}
+
+constant _DT_LNK: int8 {
+  magic external neut_path_v0_1_DT_LNK()
+}
+
+constant _DT_REG: int8 {
+  magic external neut_path_v0_1_DT_REG()
+}
+
+constant _DT_SOCK: int8 {
+  magic external neut_path_v0_1_DT_SOCK()
+}
+
+constant _DT_UNKNOWN: int8 {
+  magic external neut_path_v0_1_DT_UNKNOWN()
+}
