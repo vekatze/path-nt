@@ -4,9 +4,20 @@
       main "test.nt",
     },
   },
+  foreign {
+    input [
+      "source/foreign.c",
+    ],
+    output [
+      "foreign.o",
+    ],
+    script [
+      "{{clang}} -c -flto=thin -O2 source/foreign.c -o {{foreign}}/foreign.o",
+    ],
+  },
   dependency {
     core {
-      digest "MtNR-67G10Rbyndel_fa6BxNXRHdmS9G_vEsy0utv30",
+      digest "PGhaZV-V70nIkSoy6_ChY6w_5G-1csAydPCTgfQb0Ig",
       mirror [
         "https://github.com/vekatze/neut-core/raw/main/archive/0-50-24.tar.zst",
       ],

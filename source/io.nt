@@ -1,0 +1,176 @@
+import {
+  core.c-string {c-string, from-c-string, to-c-string},
+  core.control {discard},
+  core.errno {get-error-message, report-system-error, system},
+  core.magic,
+  core.text {format},
+  this.path {drop-last},
+}
+
+foreign {
+  getcwd(pointer, int): pointer,
+  opendir(pointer): pointer,
+  readdir(pointer): pointer,
+  closedir(pointer): int,
+  neut_path_v0_1_GET_DNAME(pointer): pointer,
+  neut_path_v0_1_GET_DTYPE(pointer): int,
+  neut_path_v0_1_DT_BLK(): int8,
+  neut_path_v0_1_DT_CHR(): int8,
+  neut_path_v0_1_DT_DIR(): int8,
+  neut_path_v0_1_DT_FIFO(): int8,
+  neut_path_v0_1_DT_LNK(): int8,
+  neut_path_v0_1_DT_REG(): int8,
+  neut_path_v0_1_DT_SOCK(): int8,
+  neut_path_v0_1_DT_UNKNOWN(): int8,
+}
+
+constant _DT_BLK: int8 {
+  magic external neut_path_v0_1_DT_BLK()
+}
+
+constant _DT_CHR: int8 {
+  magic external neut_path_v0_1_DT_CHR()
+}
+
+constant _DT_DIR: int8 {
+  magic external neut_path_v0_1_DT_DIR()
+}
+
+constant _DT_FIFO: int8 {
+  magic external neut_path_v0_1_DT_FIFO()
+}
+
+constant _DT_LNK: int8 {
+  magic external neut_path_v0_1_DT_LNK()
+}
+
+constant _DT_REG: int8 {
+  magic external neut_path_v0_1_DT_REG()
+}
+
+constant _DT_SOCK: int8 {
+  magic external neut_path_v0_1_DT_SOCK()
+}
+
+constant _DT_UNKNOWN: int8 {
+  magic external neut_path_v0_1_DT_UNKNOWN()
+}
+
+define get-current-directory(): system(text) {
+  let zero: int = 0 in
+  let result = magic external getcwd(zero, zero) in
+  if eq-int(result, 0) {
+    report-system-error()
+  } else {
+    Right(from-c-string(core.magic.cast(int, &c-string, result)))
+  }
+}
+
+data _directory {}
+
+data dtype {
+| DT_BLK
+| DT_CHR
+| DT_DIR
+| DT_FIFO
+| DT_LNK
+| DT_REG
+| DT_SOCK
+| DT_UNKNOWN
+}
+
+define _read-dtype(i: int8): dtype {
+  if eq-int8(i, _DT_REG) {
+    DT_REG
+  } else-if eq-int8(i, _DT_DIR) {
+    DT_DIR
+  } else-if eq-int8(i, _DT_BLK) {
+    DT_BLK
+  } else-if eq-int8(i, _DT_CHR) {
+    DT_CHR
+  } else-if eq-int8(i, _DT_FIFO) {
+    DT_FIFO
+  } else-if eq-int8(i, _DT_LNK) {
+    DT_LNK
+  } else-if eq-int8(i, _DT_SOCK) {
+    DT_SOCK
+  } else {
+    DT_UNKNOWN
+  }
+}
+
+data dirent {
+| Dirent(
+    kind: dtype,
+    name: text,
+  )
+}
+
+define show-dirent(e: dirent): text {
+  let Dirent of {kind, name} = e in
+  match kind {
+  | DT_DIR =>
+    format("{}/", [name])
+  | _ =>
+    format("{}", [name])
+  }
+}
+
+define _open-directory(p: &text): system(_directory) {
+  let c-str = to-c-string(p) in
+  let result on c-str = magic external opendir(c-str) in
+  discard(c-str);
+  if eq-int(result, 0) {
+    report-system-error()
+  } else {
+    Right(core.magic.cast(int, _directory, result))
+  }
+}
+
+define _read-directory(d: _directory): list(dirent) {
+  let result = magic external readdir(d) in
+  if eq-int(result, 0) {
+    []
+  } else {
+    let name = from-c-string(magic external neut_path_v0_1_GET_DNAME(result)) in
+    let kind = _read-dtype(magic external neut_path_v0_1_GET_DTYPE(result)) in
+    Cons(Dirent of {kind, name}, _read-directory(d))
+  }
+}
+
+define _close-directory(d: _directory): system(unit) {
+  let result = magic external closedir(d) in
+  if eq-int(result, -1) {
+    report-system-error()
+  } else {
+    Right(Unit)
+  }
+}
+
+define read-directory(p: &text): system(list(dirent)) {
+  try dir = _open-directory(p) in
+  let output = _read-directory(dir) in
+  try _ = _close-directory(dir) in
+  Right(output)
+}
+
+define test-zen(): system(unit) {
+  try out = read-directory("/Users/vekatze/Desktop") in
+  for(out, function (item) {
+    printf("{}\n", [show-dirent(item)])
+  });
+  try cwd = get-current-directory() in
+  pin cwd = cwd in
+  pin p2 = drop-last(cwd) in
+  printf("→{}←\n", [*p2]);
+  Right(Unit)
+}
+
+define zen(): unit {
+  match test-zen() {
+  | Left(e) =>
+    printf("{}\n", [get-error-message(e)])
+  | Right(_) =>
+    print("ok\n")
+  }
+}
