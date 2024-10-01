@@ -1,5 +1,5 @@
 import {
-  core.list {filter},
+  core.list {filter, for-each},
   core.text {intercalate, split},
   core.text.show,
   noa.gen {Gen, gen},

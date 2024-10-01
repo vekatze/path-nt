@@ -2,6 +2,7 @@ import {
   core.c-string {c-string, from-c-string, to-c-string},
   core.control {discard},
   core.errno {get-error-message, report-system-error, system},
+  core.list {for},
   core.magic,
   this.entity.dirent {Dirent, dirent},
   this.entity.dirent.show {show-dirent},
