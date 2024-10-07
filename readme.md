@@ -1,5 +1,9 @@
 # path
 
+```sh
+neut get path https://github.com/vekatze/path-nt/raw/main/archive/0-1-10.tar.zst
+```
+
 ## Summary
 
 ```neut
