@@ -1,6 +1,6 @@
 # path
 
-`path` is a library to perform path-like operations on texts.
+`path` is a library to perform path-related operations.
 
 ```sh
 neut get path https://github.com/vekatze/path-nt/raw/main/archive/0-1-10.tar.zst
