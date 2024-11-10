@@ -2,12 +2,12 @@ import {
   core.list {all, filter, length, reverse},
   core.text {
     drop-end-N,
-    drop-end-while-N,
+    drop-while-end-N,
     intercalate,
     split,
     take-N,
     take-end-N,
-    take-end-while-N,
+    take-while-end-N,
   },
   core.text.eq {eq-suffix},
 }
@@ -92,7 +92,7 @@ define take-last(path: &text): text {
   // take-last("root/foo/") => ""
   // take-last("root/foo/bar") => "bar"
   pin tmp =
-    take-end-while-N(path, function (r) {
+    take-while-end-N(path, function (r) {
       ne-rune(r, separator-rune)
     })
   in
@@ -106,7 +106,7 @@ define drop-last(path: &text): text {
   // drop-last("root/foo/") => "root/foo"
   // drop-last("root/foo/bar") => "root/foo"
   pin tmp =
-    drop-end-while-N(path, function (r) {
+    drop-while-end-N(path, function (r) {
       ne-rune(r, separator-rune)
     })
   in
