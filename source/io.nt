@@ -1,9 +1,12 @@
 import {
+  core.c-int {c-int, from-c-int},
+  core.c-size {C-Size, c-size},
   core.c-string {c-string, from-c-string, to-c-string},
   core.control {discard},
   core.errno {get-error-message, report-system-error, system},
   core.list {for},
   core.magic,
+  core.pointer {null-pointer},
   this.entity.dirent {Dirent, dirent},
   this.entity.dirent.show {show-dirent},
   this.entity.dtype {dtype-from-int},
@@ -11,51 +14,50 @@ import {
 }
 
 foreign {
-  getcwd(pointer, int): pointer,
+  getcwd(pointer, c-size): pointer,
   opendir(pointer): pointer,
   readdir(pointer): pointer,
-  closedir(pointer): int,
+  closedir(pointer): c-int,
   neut_path_v0_1_GET_DNAME(pointer): pointer,
-  neut_path_v0_1_GET_DTYPE(pointer): int,
+  neut_path_v0_1_GET_DTYPE(pointer): int8,
 }
 
 data _directory {}
 
 define get-current-directory(): system(text) {
-  let zero: int = 0 in
-  let result = magic external getcwd(zero, zero) in
-  if eq-int(result, 0) {
+  let result = magic external getcwd(null-pointer, C-Size(0)) in
+  if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
   } else {
-    Right(from-c-string(core.magic.cast(int, &c-string, result)))
+    Right(from-c-string(core.magic.cast(pointer, &c-string, result)))
   }
 }
 
 define _open-directory(p: &text): system(_directory) {
   let c-str = to-c-string(p) in
-  let result on c-str = magic external opendir(c-str) in
+  let result on c-str = magic external opendir(magic cast(&c-string, pointer, c-str)) in
   discard(c-str);
-  if eq-int(result, 0) {
+  if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
   } else {
-    Right(core.magic.cast(int, _directory, result))
+    Right(core.magic.cast(pointer, _directory, result))
   }
 }
 
 define _read-directory(d: _directory): list(dirent) {
-  let result = magic external readdir(d) in
-  if eq-int(result, 0) {
+  let result = magic external readdir(magic cast(_directory, pointer, d)) in
+  if eq-int(magic cast(pointer, int, result), 0) {
     []
   } else {
-    let name = from-c-string(magic external neut_path_v0_1_GET_DNAME(result)) in
+    let name = from-c-string(magic cast(pointer, &c-string, magic external neut_path_v0_1_GET_DNAME(result))) in
     let kind = dtype-from-int(magic external neut_path_v0_1_GET_DTYPE(result)) in
     Cons(Dirent of {kind, name}, _read-directory(d))
   }
 }
 
 define _close-directory(d: _directory): system(unit) {
-  let result = magic external closedir(d) in
-  if eq-int(result, -1) {
+  let result = magic external closedir(magic cast(_directory, pointer, d)) in
+  if eq-int(from-c-int(result), -1) {
     report-system-error()
   } else {
     Right(Unit)

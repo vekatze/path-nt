@@ -1,10 +1,4 @@
 foreign {
-  getcwd(pointer, int): pointer,
-  opendir(pointer): pointer,
-  readdir(pointer): pointer,
-  closedir(pointer): int,
-  neut_path_v0_1_GET_DNAME(pointer): pointer,
-  neut_path_v0_1_GET_DTYPE(pointer): int,
   neut_path_v0_1_DT_BLK(): int8,
   neut_path_v0_1_DT_CHR(): int8,
   neut_path_v0_1_DT_DIR(): int8,

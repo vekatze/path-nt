@@ -6,7 +6,7 @@ char *neut_path_v0_1_GET_DNAME(struct dirent *d) {
 }
 
 __attribute__((always_inline))
-int neut_path_v0_1_GET_DTYPE(struct dirent *d) {
+__uint8_t neut_path_v0_1_GET_DTYPE(struct dirent *d) {
   return d->d_type;
 }
 
