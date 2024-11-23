@@ -1,6 +1,6 @@
 import {
   core.c-int {c-int, from-c-int},
-  core.c-size {C-Size, c-size},
+  core.c-size {c-size},
   core.c-string {c-string, from-c-string, to-c-string},
   core.control {discard},
   core.errno {get-error-message, report-system-error, system},
@@ -25,7 +25,7 @@ foreign {
 data _directory {}
 
 define get-current-directory(): system(text) {
-  let result = magic external getcwd(null-pointer, C-Size(0)) in
+  let result = magic external getcwd(null-pointer, 0) in
   if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
   } else {
