@@ -29,7 +29,8 @@ define get-current-directory(): system(text) {
   if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
   } else {
-    Right(from-c-string(core.magic.cast(pointer, &c-string, result)))
+    pin cwd = core.magic.cast(pointer, c-string, result) in
+    Right(from-c-string(cwd))
   }
 }
 
