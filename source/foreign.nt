@@ -9,34 +9,50 @@ foreign {
   neut_path_v0_1_DT_UNKNOWN(): int8,
 }
 
-constant _DT_BLK: int8 {
-  magic external neut_path_v0_1_DT_BLK()
+inline _DT_BLK: int8 {
+  magic opaque-value {
+    magic external neut_path_v0_1_DT_BLK()
+  }
 }
 
-constant _DT_CHR: int8 {
-  magic external neut_path_v0_1_DT_CHR()
+inline _DT_CHR: int8 {
+  magic opaque-value {
+    magic external neut_path_v0_1_DT_CHR()
+  }
 }
 
-constant _DT_DIR: int8 {
-  magic external neut_path_v0_1_DT_DIR()
+inline _DT_DIR: int8 {
+  magic opaque-value {
+    magic external neut_path_v0_1_DT_DIR()
+  }
 }
 
-constant _DT_FIFO: int8 {
-  magic external neut_path_v0_1_DT_FIFO()
+inline _DT_FIFO: int8 {
+  magic opaque-value {
+    magic external neut_path_v0_1_DT_FIFO()
+  }
 }
 
-constant _DT_LNK: int8 {
-  magic external neut_path_v0_1_DT_LNK()
+inline _DT_LNK: int8 {
+  magic opaque-value {
+    magic external neut_path_v0_1_DT_LNK()
+  }
 }
 
-constant _DT_REG: int8 {
-  magic external neut_path_v0_1_DT_REG()
+inline _DT_REG: int8 {
+  magic opaque-value {
+    magic external neut_path_v0_1_DT_REG()
+  }
 }
 
-constant _DT_SOCK: int8 {
-  magic external neut_path_v0_1_DT_SOCK()
+inline _DT_SOCK: int8 {
+  magic opaque-value {
+    magic external neut_path_v0_1_DT_SOCK()
+  }
 }
 
-constant _DT_UNKNOWN: int8 {
-  magic external neut_path_v0_1_DT_UNKNOWN()
+inline _DT_UNKNOWN: int8 {
+  magic opaque-value {
+    magic external neut_path_v0_1_DT_UNKNOWN()
+  }
 }

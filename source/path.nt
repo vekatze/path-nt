@@ -12,11 +12,11 @@ import {
   core.text.eq {eq-suffix},
 }
 
-constant separator-rune: rune {
+inline separator-rune: rune {
   `/`
 }
 
-constant separator: &text {
+inline separator: &text {
   introspect operating-system {
   | linux =>
     "/"

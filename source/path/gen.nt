@@ -8,13 +8,13 @@ import {
   this.path {separator},
 }
 
-constant path-components: gen(list(text)) {
+inline path-components: gen(list(text)) {
   lists(
     texts(
       Config of {
         min-length = 0,
-        max-length = none(),
-        rune-generator = none(),
+        max-length = none,
+        rune-generator = none,
         rune-acceptor = {
           function (r) {
             and(ne-rune(r, `/`), ne-rune(r, `\0`))
@@ -25,7 +25,7 @@ constant path-components: gen(list(text)) {
   )
 }
 
-constant paths: gen(text) {
+inline paths: gen(text) {
   Gen of {
     generate = {
       function (size) {
