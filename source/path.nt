@@ -135,13 +135,13 @@ define split-extension(path: &text): pair(text, text) {
     })
   in
   match dot-pos-or-none {
-  | Error(_) =>
+  | Left(_) =>
     Pair(clean(path), *"")
-  | OK(dot-pos) =>
+  | Right(dot-pos) =>
     match slash-pos-or-none {
-    | Error(_) =>
+    | Left(_) =>
       _split-extension(path, add-int(dot-pos, 1))
-    | OK(slash-pos) =>
+    | Right(slash-pos) =>
       if lt-int(slash-pos, dot-pos) {
         Pair(clean(path), *"")
       } else {

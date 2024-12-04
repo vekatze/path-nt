@@ -30,7 +30,7 @@ define get-current-directory(): system(text) {
     report-system-error()
   } else {
     pin cwd = core.magic.cast(pointer, c-string, result) in
-    OK(from-c-string(cwd))
+    Right(from-c-string(cwd))
   }
 }
 
@@ -41,7 +41,7 @@ define _open-directory(p: &text): system(_directory) {
   if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
   } else {
-    OK(core.magic.cast(pointer, _directory, result))
+    Right(core.magic.cast(pointer, _directory, result))
   }
 }
 
@@ -61,7 +61,7 @@ define _close-directory(d: _directory): system(unit) {
   if eq-int(from-c-int(result), -1) {
     report-system-error()
   } else {
-    OK(Unit)
+    Right(Unit)
   }
 }
 
@@ -69,7 +69,7 @@ define read-directory(p: &text): system(list(dirent)) {
   try dir = _open-directory(p) in
   let output = _read-directory(dir) in
   try _ = _close-directory(dir) in
-  OK(output)
+  Right(output)
 }
 
 define test-zen(): system(unit) {
@@ -81,14 +81,14 @@ define test-zen(): system(unit) {
   pin cwd = cwd in
   pin p2 = drop-last(cwd) in
   printf("→{}←\n", [*p2]);
-  OK(Unit)
+  Right(Unit)
 }
 
 define zen(): unit {
   match test-zen() {
-  | Error(e) =>
+  | Left(e) =>
     printf("{}\n", [get-error-message(e)])
-  | OK(_) =>
+  | Right(_) =>
     print("ok\n")
   }
 }
