@@ -26,10 +26,11 @@ inline path-components: gen(list(text)) {
 }
 
 inline paths: gen(text) {
+  let Gen of {generate, shrink} = path-components in
   Gen of {
     generate = {
       function (size) {
-        let xs = path-components::generate(size) in
+        let xs = generate(size) in
         intercalate(xs, *separator)
       }
     },
@@ -37,7 +38,7 @@ inline paths: gen(text) {
       function (path) {
         pin path = path in
         let components = split(path, separator) in
-        let components-list = path-components::shrink(components) in
+        let components-list = shrink(components) in
         let cands =
           for-each(components-list, function (components) {
             intercalate(components, *separator)

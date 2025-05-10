@@ -1,11 +1,12 @@
 import {
-  noa.suite {noa},
+  noa.suite {Trope, noa},
   this.path {clean, drop-last, is-absolute, is-relative, split-extension, take-last},
   this.path.gen {paths},
 }
 
 define main(): unit {
-  noa::check(
+  let Trope of {check = !check} = noa in
+  !check(
     "∀ (p: path). clean(clean(p)) == clean(p)",
     paths,
     function (p) {
@@ -15,7 +16,7 @@ define main(): unit {
       eq-text(p1, p2)
     },
   );
-  noa::check(
+  !check(
     "∀ (p: path). is-absolute(p) <=> not(is-relative(p))",
     paths,
     function (p) {
@@ -27,7 +28,7 @@ define main(): unit {
       }
     },
   );
-  noa::check(
+  !check(
     "∀ (p: path). is-relative(p) <=> not(is-absolute(p))",
     paths,
     function (p) {
@@ -39,7 +40,7 @@ define main(): unit {
       }
     },
   );
-  noa::check(
+  !check(
     "∀ (p: path). is-absolute(p) <=> is-absolute(clean(p))",
     paths,
     function (p) {
@@ -53,7 +54,7 @@ define main(): unit {
       }
     },
   );
-  noa::check(
+  !check(
     "∀ (p: path). is-relative(p) <=> is-relative(clean(p))",
     paths,
     function (p) {
@@ -67,7 +68,7 @@ define main(): unit {
       }
     },
   );
-  noa::check(
+  !check(
     "∀ (p: path). append(drop-last(p), take-last(p)) == clean(p)",
     paths,
     function (p) {
@@ -79,7 +80,7 @@ define main(): unit {
       eq-text(p1, p')
     },
   );
-  noa::check(
+  !check(
     "∀ (p: path). let Pair(base, ext) = split-extension(p) in clean(text-append(base, ext)) == clean(p)",
     paths,
     function (p) {
