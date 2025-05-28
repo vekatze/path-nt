@@ -1,12 +1,14 @@
 import {
-  noa.suite {Trope, noa},
+  noa.move.check {check},
+  noa.move.make-noa-kit {make-default-noa-kit},
   this.path {clean, drop-last, is-absolute, is-relative, split-extension, take-last},
   this.path.gen {paths},
 }
 
 define main(): unit {
-  let Trope of {check = !check} = noa in
-  !check(
+  pin k = make-default-noa-kit() in
+  check(
+    k,
     "∀ (p: path). clean(clean(p)) == clean(p)",
     paths,
     function (p) {
@@ -16,7 +18,8 @@ define main(): unit {
       eq-text(p1, p2)
     },
   );
-  !check(
+  check(
+    k,
     "∀ (p: path). is-absolute(p) <=> not(is-relative(p))",
     paths,
     function (p) {
@@ -28,7 +31,8 @@ define main(): unit {
       }
     },
   );
-  !check(
+  check(
+    k,
     "∀ (p: path). is-relative(p) <=> not(is-absolute(p))",
     paths,
     function (p) {
@@ -40,7 +44,8 @@ define main(): unit {
       }
     },
   );
-  !check(
+  check(
+    k,
     "∀ (p: path). is-absolute(p) <=> is-absolute(clean(p))",
     paths,
     function (p) {
@@ -54,7 +59,8 @@ define main(): unit {
       }
     },
   );
-  !check(
+  check(
+    k,
     "∀ (p: path). is-relative(p) <=> is-relative(clean(p))",
     paths,
     function (p) {
@@ -68,7 +74,8 @@ define main(): unit {
       }
     },
   );
-  !check(
+  check(
+    k,
     "∀ (p: path). append(drop-last(p), take-last(p)) == clean(p)",
     paths,
     function (p) {
@@ -80,7 +87,8 @@ define main(): unit {
       eq-text(p1, p')
     },
   );
-  !check(
+  check(
+    k,
     "∀ (p: path). let Pair(base, ext) = split-extension(p) in clean(text-append(base, ext)) == clean(p)",
     paths,
     function (p) {
