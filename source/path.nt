@@ -26,7 +26,7 @@ inline separator: &text {
 }
 
 define is-absolute(path: &text): bool {
-  pin head = take-N(path, 1) in
+  pin head = take-N(path, 1);
   eq-text(head, separator)
 }
 
@@ -39,7 +39,7 @@ define _clean-double-dots(components: list(text), acc: list(text)): list(text) {
   | Nil =>
     reverse(acc)
   | Cons(c, cs) =>
-    let b on c = eq-text(c, "..") in
+    let b on c = eq-text(c, "..");
     if b {
       match acc {
       | Nil =>
@@ -54,18 +54,17 @@ define _clean-double-dots(components: list(text), acc: list(text)): list(text) {
 }
 
 define clean(path: &text): text {
-  let components = split(path, separator) in
+  let components = split(path, separator);
   let components' =
     filter(components, function (component) {
       all([
         not(eq-text(component, "")),
         not(eq-text(component, ".")),
       ])
-    })
-  in
-  let components' = _clean-double-dots(components', []) in
+    });
+  let components' = _clean-double-dots(components', []);
   if is-absolute(path) {
-    let len on components' = length(components') in
+    let len on components' = length(components');
     if eq-int(len, 0) {
       *separator
     } else {
@@ -80,7 +79,7 @@ define append(path1: &text, path2: &text): text {
   if eq-text(path1, "") {
     *path2
   } else {
-    pin tmp = core.text.join-N([path1, separator, path2]) in
+    pin tmp = core.text.join-N([path1, separator, path2]);
     clean(tmp)
   }
 }
@@ -94,8 +93,7 @@ define take-last(path: &text): text {
   pin tmp =
     take-while-end-N(path, function (r) {
       ne-rune(r, separator-rune)
-    })
-  in
+    });
   clean(tmp)
 }
 
@@ -108,14 +106,13 @@ define drop-last(path: &text): text {
   pin tmp =
     drop-while-end-N(path, function (r) {
       ne-rune(r, separator-rune)
-    })
-  in
+    });
   clean(tmp)
 }
 
 define _split-extension(path: &text, pivot: int): pair(text, text) {
-  pin file = drop-end-N(path, pivot) in
-  let ext = take-end-N(path, pivot) in
+  pin file = drop-end-N(path, pivot);
+  let ext = take-end-N(path, pivot);
   if or(eq-suffix(file, "."), eq-suffix(file, "/")) {
     Pair(clean(path), *"")
   } else {
@@ -127,13 +124,11 @@ define split-extension(path: &text): pair(text, text) {
   let dot-pos-or-none =
     core.text.find-end(path, function (r) {
       eq-rune(r, `.`)
-    })
-  in
+    });
   let slash-pos-or-none =
     core.text.find-end(path, function (r) {
       eq-rune(r, `/`)
-    })
-  in
+    });
   match dot-pos-or-none {
   | Left(_) =>
     Pair(clean(path), *"")
@@ -149,24 +144,4 @@ define split-extension(path: &text): pair(text, text) {
       }
     }
   }
-}
-
-define zen(): unit {
-  let p = "/Users/foo/Downloads/sample" in
-  let Pair(file, ext) = split-extension(p) in
-  printf("file: {}\n", [file]);
-  printf("ext: {}\n", [ext]);
-  printf("result: {}\n", [clean("foo/./bar//../buz.txt")]);
-  printf("result: {}\n", [take-last("/foo/./foo.txt")]);
-  printf("result: {}\n", [drop-last("foo/bar.txt")]);
-  printf("result: {}\n", [drop-last("/root/foo/.//item.txt")]);
-  printf("result: {}\n", [drop-last("///")]);
-  printf("result: {}\n", [this.path.append("test/sample", "foo.txt")]);
-  printf("result: {}\n", [this.path.append("test/sample/", "foo.txt")]);
-  printf("result: {}\n", [this.path.append("test/sample", "/foo.txt")]);
-  printf("result: {}\n", [this.path.append("test/.//sample/", "/foo.txt")]);
-  pin result = this.path.append("test/.//sample/", "/foo.txt") in
-  let init = drop-last(result) in
-  let last = take-last(result) in
-  printf("directory: {}\ntake-last: {}\n", [init, last])
 }

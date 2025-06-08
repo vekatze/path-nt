@@ -7,6 +7,7 @@ import {
   core.magic,
   core.pointer {null-pointer},
   core.system {get-error-message, report-system-error, system},
+  core.text.io {print-line},
   this.entity.dirent {Dirent, dirent},
   this.entity.dirent.show {show-dirent},
   this.entity.dtype {dtype-from-int},
@@ -25,18 +26,18 @@ foreign {
 data _directory {}
 
 define get-current-directory(): system(text) {
-  let result = magic external getcwd(null-pointer, 0) in
+  let result = magic external getcwd(null-pointer, 0);
   if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
   } else {
-    pin cwd = core.magic.cast(pointer, c-string, result) in
+    pin cwd = core.magic.cast(pointer, c-string, result);
     Right(from-c-string(cwd))
   }
 }
 
 define _open-directory(p: &text): system(_directory) {
-  let c-str = to-c-string(p) in
-  let result on c-str = magic external opendir(magic cast(&c-string, pointer, c-str)) in
+  let c-str = to-c-string(p);
+  let result on c-str = magic external opendir(magic cast(&c-string, pointer, c-str));
   discard(c-str);
   if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
@@ -46,18 +47,18 @@ define _open-directory(p: &text): system(_directory) {
 }
 
 define _read-directory(d: _directory): list(dirent) {
-  let result = magic external readdir(magic cast(_directory, pointer, d)) in
+  let result = magic external readdir(magic cast(_directory, pointer, d));
   if eq-int(magic cast(pointer, int, result), 0) {
     []
   } else {
-    let name = from-c-string(magic cast(pointer, &c-string, magic external neut_path_v0_1_GET_DNAME(result))) in
-    let kind = dtype-from-int(magic external neut_path_v0_1_GET_DTYPE(result)) in
+    let name = from-c-string(magic cast(pointer, &c-string, magic external neut_path_v0_1_GET_DNAME(result)));
+    let kind = dtype-from-int(magic external neut_path_v0_1_GET_DTYPE(result));
     Cons(Dirent of {kind, name}, _read-directory(d))
   }
 }
 
 define _close-directory(d: _directory): system(unit) {
-  let result = magic external closedir(magic cast(_directory, pointer, d)) in
+  let result = magic external closedir(magic cast(_directory, pointer, d));
   if eq-int(from-c-int(result), -1) {
     report-system-error()
   } else {
@@ -66,28 +67,32 @@ define _close-directory(d: _directory): system(unit) {
 }
 
 define read-directory(p: &text): system(list(dirent)) {
-  try dir = _open-directory(p) in
-  let output = _read-directory(dir) in
-  try _ = _close-directory(dir) in
+  try dir = _open-directory(p);
+  let output = _read-directory(dir);
+  try _ = _close-directory(dir);
   Right(output)
 }
 
 define test-zen(): system(unit) {
-  try out = read-directory("/Users/vekatze/Desktop") in
+  try out = read-directory("/Users/vekatze/Desktop");
   for(out, function (item) {
-    printf("{}\n", [show-dirent(item)])
+    pin t = show-dirent(item);
+    print-line(t);
   });
-  try cwd = get-current-directory() in
-  pin cwd = cwd in
-  pin p2 = drop-last(cwd) in
-  printf("→{}←\n", [*p2]);
+  try cwd = get-current-directory();
+  pin cwd = cwd;
+  pin p2 = drop-last(cwd);
+  print("→");
+  print(p2);
+  print-line("←");
   Right(Unit)
 }
 
 define zen(): unit {
   match test-zen() {
   | Left(e) =>
-    printf("{}\n", [get-error-message(e)])
+    pin e = get-error-message(e);
+    print-line(e);
   | Right(_) =>
     print("ok\n")
   }

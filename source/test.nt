@@ -6,15 +6,15 @@ import {
 }
 
 define main(): unit {
-  pin k = make-default-noa-kit() in
+  pin k = make-default-noa-kit();
   check(
     k,
     "∀ (p: path). clean(clean(p)) == clean(p)",
     paths,
     function (p) {
-      pin p = p in
-      pin p1 = clean(p) in
-      pin p2 = clean(p1) in
+      pin p = p;
+      pin p1 = clean(p);
+      pin p2 = clean(p1);
       eq-text(p1, p2)
     },
   );
@@ -23,7 +23,7 @@ define main(): unit {
     "∀ (p: path). is-absolute(p) <=> not(is-relative(p))",
     paths,
     function (p) {
-      pin p = p in
+      pin p = p;
       if is-absolute(p) {
         not(is-relative(p))
       } else {
@@ -36,7 +36,7 @@ define main(): unit {
     "∀ (p: path). is-relative(p) <=> not(is-absolute(p))",
     paths,
     function (p) {
-      pin p = p in
+      pin p = p;
       if is-relative(p) {
         not(is-absolute(p))
       } else {
@@ -49,12 +49,12 @@ define main(): unit {
     "∀ (p: path). is-absolute(p) <=> is-absolute(clean(p))",
     paths,
     function (p) {
-      pin p = p in
+      pin p = p;
       if is-absolute(p) {
-        pin p' = clean(p) in
+        pin p' = clean(p);
         is-absolute(p')
       } else {
-        pin p' = clean(p) in
+        pin p' = clean(p);
         not(is-absolute(p'))
       }
     },
@@ -64,12 +64,12 @@ define main(): unit {
     "∀ (p: path). is-relative(p) <=> is-relative(clean(p))",
     paths,
     function (p) {
-      pin p = p in
+      pin p = p;
       if is-relative(p) {
-        pin p' = clean(p) in
+        pin p' = clean(p);
         is-relative(p')
       } else {
-        pin p' = clean(p) in
+        pin p' = clean(p);
         not(is-relative(p'))
       }
     },
@@ -79,11 +79,11 @@ define main(): unit {
     "∀ (p: path). append(drop-last(p), take-last(p)) == clean(p)",
     paths,
     function (p) {
-      pin p = p in
-      pin dir = drop-last(p) in
-      pin base = take-last(p) in
-      pin p' = this.path.append(dir, base) in
-      pin p1 = clean(p) in
+      pin p = p;
+      pin dir = drop-last(p);
+      pin base = take-last(p);
+      pin p' = this.path.append(dir, base);
+      pin p1 = clean(p);
       eq-text(p1, p')
     },
   );
@@ -92,13 +92,13 @@ define main(): unit {
     "∀ (p: path). let Pair(base, ext) = split-extension(p) in clean(text-append(base, ext)) == clean(p)",
     paths,
     function (p) {
-      pin p = p in
-      let Pair(init, last) = split-extension(p) in
-      pin init = init in
-      pin last = last in
-      pin p' = core.text.append(init, last) in
-      pin p1 = clean(p) in
-      pin p2 = clean(p') in
+      pin p = p;
+      let Pair(init, last) = split-extension(p);
+      pin init = init;
+      pin last = last;
+      pin p' = core.text.append(init, last);
+      pin p1 = clean(p);
+      pin p2 = clean(p');
       eq-text(p1, p2)
     },
   )

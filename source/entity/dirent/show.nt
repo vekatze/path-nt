@@ -5,7 +5,7 @@ import {
 }
 
 define show-dirent(e: dirent): text {
-  let Dirent of {kind, name} = e in
+  let Dirent of {kind, name} = e;
   match kind {
   | DT_DIR =>
     format("{}/", [name])

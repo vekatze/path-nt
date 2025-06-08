@@ -12,10 +12,10 @@ inline path-components: gen(list(text)) {
   list-gen(
     text-gen(
       Config of {
-        min-length = 0,
-        max-length = none,
-        rune-generator = none,
-        rune-acceptor = {
+        min-length := 0,
+        max-length := none,
+        rune-generator := none,
+        rune-acceptor := {
           function (r) {
             and(ne-rune(r, `/`), ne-rune(r, `\0`))
           }
@@ -26,29 +26,28 @@ inline path-components: gen(list(text)) {
 }
 
 inline paths: gen(text) {
-  let Gen of {generate, shrink} = path-components in
+  let Gen of {generate, shrink} = path-components;
   Gen of {
-    generate = {
+    generate := {
       function (size) {
-        let xs = generate(size) in
+        let xs = generate(size);
         intercalate(xs, *separator)
       }
     },
-    shrink = {
+    shrink := {
       function (path) {
-        pin path = path in
-        let components = split(path, separator) in
-        let components-list = shrink(components) in
+        pin path = path;
+        let components = split(path, separator);
+        let components-list = shrink(components);
         let cands =
           for-each(components-list, function (components) {
             intercalate(components, *separator)
-          })
-        in
+          });
         filter(cands, function (cand) {
           ne-text(path, cand)
         })
       }
     },
-    viewer = core.text.show.as-show,
+    viewer := core.text.show.as-show,
   }
 }
