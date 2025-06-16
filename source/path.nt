@@ -79,8 +79,9 @@ define append(path1: &text, path2: &text): text {
   if eq-text(path1, "") {
     *path2
   } else {
-    pin tmp = core.text.join-N([path1, separator, path2]);
-    clean(tmp)
+    pin tmp1 = core.text.append(path1, separator);
+    pin tmp2 = core.text.append(tmp1, path2);
+    clean(tmp2)
   }
 }
 
