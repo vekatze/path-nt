@@ -43,7 +43,7 @@ define _clean-double-dots(components: list(text), acc: list(text)): list(text) {
     if b {
       match acc {
       | Nil =>
-        _clean-double-dots(cs, [])
+        _clean-double-dots(cs, Nil)
       | Cons(_, acc-rest) =>
         _clean-double-dots(cs, acc-rest)
       }
@@ -57,12 +57,12 @@ define clean(path: &text): text {
   let components = split(path, separator);
   let components' =
     filter(components, function (component) {
-      all([
+      all(List[
         not(eq-text(component, "")),
         not(eq-text(component, ".")),
       ])
     });
-  let components' = _clean-double-dots(components', []);
+  let components' = _clean-double-dots(components', List[]);
   if is-absolute(path) {
     let len on components' = length(components');
     if eq-int(len, 0) {

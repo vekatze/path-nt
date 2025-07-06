@@ -49,7 +49,7 @@ define _open-directory(p: &text): system(_directory) {
 define _read-directory(d: _directory): list(dirent) {
   let result = magic external readdir(magic cast(_directory, pointer, d));
   if eq-int(magic cast(pointer, int, result), 0) {
-    []
+    Nil
   } else {
     let name = from-c-string(magic cast(pointer, &c-string, magic external neut_path_v0_1_GET_DNAME(result)));
     let kind = dtype-from-int(magic external neut_path_v0_1_GET_DTYPE(result));
