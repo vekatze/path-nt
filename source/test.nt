@@ -1,6 +1,6 @@
 import {
-  noa.move.check {check},
-  noa.move.make-noa-kit {make-default-noa-kit},
+  noa.check {check},
+  noa.make-noa-kit {make-default-noa-kit},
   this.path {clean, drop-last, is-absolute, is-relative, split-extension, take-last},
   this.path.gen {paths},
 }

@@ -1,10 +1,9 @@
 import {
   core.list {filter, for-each},
   core.text {intercalate, split},
-  core.text.show,
-  noa.move.gen.custom.text {Config, text-gen},
-  noa.move.gen.list {list-gen},
-  noa.rule.gen {Gen, gen},
+  noa.gen {Gen, gen},
+  noa.gen.custom.text {Config, text-gen},
+  noa.gen.list {list-gen},
   this.path {separator},
 }
 
@@ -48,6 +47,5 @@ inline paths: gen(text) {
         })
       }
     },
-    viewer := core.text.show.as-show,
   }
 }
