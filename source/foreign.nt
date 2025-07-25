@@ -1,3 +1,9 @@
+import {
+  core.memory {store-int8},
+  core.pointer {shift},
+  core.text {text-byte-length},
+}
+
 foreign {
   neut_path_v0_1_DT_BLK(): int8,
   neut_path_v0_1_DT_CHR(): int8,
@@ -7,6 +13,9 @@ foreign {
   neut_path_v0_1_DT_REG(): int8,
   neut_path_v0_1_DT_SOCK(): int8,
   neut_path_v0_1_DT_UNKNOWN(): int8,
+  neut_path_v0_1_is_regular_file(pointer): int,
+  neut_path_v0_1_is_directory(pointer): int,
+  llvm.memcpy.p0.p0.i64(pointer, pointer, int64, int1): void,
 }
 
 inline _DT_BLK: int8 {
@@ -55,4 +64,24 @@ inline _DT_UNKNOWN: int8 {
   magic opaque-value {
     magic external neut_path_v0_1_DT_UNKNOWN()
   }
+}
+
+define _to-c-string-buf(t: &text, len: int, buf: pointer): unit {
+  let src-ptr = core.text._get-content-pointer(t);
+  let _ = magic external llvm.memcpy.p0.p0.i64(buf, src-ptr, len, 0);
+  store-int8(0, shift(buf, len));
+}
+
+inline is-regular-file(t: &text): bool {
+  let len = text-byte-length(t);
+  let buf = magic alloca(int8, add-int(len, 1));
+  _to-c-string-buf(t, len, buf);
+  eq-int(magic external neut_path_v0_1_is_regular_file(buf), 1)
+}
+
+inline is-directory(t: &text): bool {
+  let len = text-byte-length(t);
+  let buf = magic alloca(int8, add-int(len, 1));
+  _to-c-string-buf(t, len, buf);
+  eq-int(magic external neut_path_v0_1_is_directory(buf), 1)
 }

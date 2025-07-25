@@ -1,4 +1,6 @@
 #include <dirent.h>
+#include <stdbool.h>
+#include <sys/stat.h>
 
 __attribute__((always_inline)) char *
 neut_path_v0_1_GET_DNAME(struct dirent *d) {
@@ -40,4 +42,20 @@ __attribute__((always_inline)) __uint8_t neut_path_v0_1_DT_LNK() {
 
 __attribute__((always_inline)) __uint8_t neut_path_v0_1_DT_SOCK() {
   return DT_SOCK;
+}
+
+int64_t neut_path_v0_1_is_regular_file(const char *path) {
+  struct stat st;
+  if (stat(path, &st) != 0) {
+    return false;
+  }
+  return S_ISREG(st.st_mode) ? 1 : 0;
+}
+
+int64_t neut_path_v0_1_is_directory(const char *path) {
+  struct stat st;
+  if (stat(path, &st) != 0) {
+    return false;
+  }
+  return S_ISDIR(st.st_mode) ? 1 : 0;
 }

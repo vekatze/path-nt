@@ -11,6 +11,7 @@ import {
   this.entity.dirent {Dirent, dirent},
   this.entity.dirent.show {show-dirent},
   this.entity.dtype {dtype-from-int},
+  this.foreign {is-directory, is-regular-file},
   this.path {drop-last},
 }
 
@@ -74,7 +75,7 @@ define read-directory(p: &text): system(list(dirent)) {
 }
 
 define test-zen(): system(unit) {
-  try out = read-directory("/Users/vekatze/Desktop");
+  try out = read-directory("/Users/");
   for(out, function (item) {
     pin t = show-dirent(item);
     print-line(t);
@@ -89,6 +90,14 @@ define test-zen(): system(unit) {
 }
 
 define zen(): unit {
+  pin b = is-regular-file("/usr/bin/xxd");
+  vet(b);
+  pin b = is-regular-file("/usr/bin/");
+  vet(b);
+  pin b = is-directory("/etc");
+  vet(b);
+  pin b = is-directory("/etc/");
+  vet(b);
   match test-zen() {
   | Left(e) =>
     pin e = get-error-message(e);
