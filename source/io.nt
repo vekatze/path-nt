@@ -5,13 +5,14 @@ import {
   core.control {discard},
   core.list {for},
   core.magic,
-  core.pointer {null-pointer},
+  core.memory {store-int8},
+  core.pointer {null-pointer, shift},
   core.system {get-error-message, report-system-error, system},
+  core.text {text-byte-length},
   core.text.io {print-line},
   this.entity.dirent {Dirent, dirent},
   this.entity.dirent.show {show-dirent},
   this.entity.dtype {dtype-from-int},
-  this.foreign {is-directory, is-regular-file},
   this.path {drop-last},
 }
 
@@ -72,6 +73,32 @@ define read-directory(p: &text): system(list(dirent)) {
   let output = _read-directory(dir);
   try _ = _close-directory(dir);
   Right(output)
+}
+
+foreign {
+  neut_path_v0_1_is_regular_file(pointer): int,
+  neut_path_v0_1_is_directory(pointer): int,
+  llvm.memcpy.p0.p0.i64(pointer, pointer, int64, int1): void,
+}
+
+define _to-c-string-buf(t: &text, len: int, buf: pointer): unit {
+  let src-ptr = core.text._get-content-pointer(t);
+  let _ = magic external llvm.memcpy.p0.p0.i64(buf, src-ptr, len, 0);
+  store-int8(0, shift(buf, len));
+}
+
+inline is-regular-file(t: &text): bool {
+  let len = text-byte-length(t);
+  let buf = magic alloca(int8, add-int(len, 1));
+  _to-c-string-buf(t, len, buf);
+  eq-int(magic external neut_path_v0_1_is_regular_file(buf), 1)
+}
+
+inline is-directory(t: &text): bool {
+  let len = text-byte-length(t);
+  let buf = magic alloca(int8, add-int(len, 1));
+  _to-c-string-buf(t, len, buf);
+  eq-int(magic external neut_path_v0_1_is_directory(buf), 1)
 }
 
 define test-zen(): system(unit) {
