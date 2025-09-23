@@ -23,6 +23,7 @@ foreign {
   closedir(pointer): c-int,
   neut_path_v0_1_GET_DNAME(pointer): pointer,
   neut_path_v0_1_GET_DTYPE(pointer): int8,
+  neut_path_v0_1_mkdir(pointer, int): int,
 }
 
 data _directory {}
@@ -101,6 +102,18 @@ inline is-directory(t: &text): bool {
   eq-int(magic external neut_path_v0_1_is_directory(buf), 1)
 }
 
+define create-directory<mode := 0o777>(t: &text): system(unit) {
+  let len = text-byte-length(t);
+  let buf = magic alloca(int8, add-int(len, 1));
+  _to-c-string-buf(t, len, buf);
+  let result = magic external neut_path_v0_1_mkdir(buf, mode);
+  if lt-int(result, 0) {
+    report-system-error()
+  } else {
+    Right(Unit)
+  }
+}
+
 define test-zen(): system(unit) {
   try out = read-directory("/Users/");
   for(out, function (item) {
@@ -117,6 +130,8 @@ define test-zen(): system(unit) {
 }
 
 define zen(): unit {
+  pin r = create-directory("/Users/vekatze/Desktop/hey");
+  vet(r);
   pin b = is-regular-file("/usr/bin/xxd");
   vet(b);
   pin b = is-regular-file("/usr/bin/");

@@ -59,3 +59,7 @@ int64_t neut_path_v0_1_is_directory(const char *path) {
   }
   return S_ISDIR(st.st_mode) ? 1 : 0;
 }
+
+int64_t neut_path_v0_1_mkdir(const char *path, mode_t mode) {
+  return (int64_t)mkdir(path, mode);
+}
