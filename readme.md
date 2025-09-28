@@ -3,7 +3,7 @@
 `path` is a library to perform path-related operations.
 
 ```sh
-neut get path https://github.com/vekatze/path-nt/raw/main/archive/0-1-37.tar.zst
+neut get path https://github.com/vekatze/path-nt/raw/main/archive/0-1-38.tar.zst
 ```
 
 ## Types
