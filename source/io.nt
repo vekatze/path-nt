@@ -3,9 +3,9 @@ import {
   core.c-size {c-size},
   core.c-string {c-string, from-c-string, to-c-string},
   core.control {discard},
-  core.list {for},
+  core.list {filter, for, for-each},
   core.magic,
-  core.memory {store-int8},
+  core.memory {load-int, store-int8},
   core.pointer {null-pointer, shift},
   core.system {get-error-message, report-system-error, system},
   core.text {text-byte-length},
@@ -14,6 +14,7 @@ import {
   this.entity.dirent.show {show-dirent},
   this.entity.dtype {dtype-from-int},
   this.path {drop-last},
+  time.time {Time, time, to-ISO8601-local},
 }
 
 foreign {
@@ -24,6 +25,7 @@ foreign {
   neut_path_v0_1_GET_DNAME(pointer): pointer,
   neut_path_v0_1_GET_DTYPE(pointer): int8,
   neut_path_v0_1_mkdir(pointer, int): int,
+  neut_path_v0_1_get_modification_time(pointer, pointer, pointer): int,
 }
 
 data _directory {}
@@ -76,6 +78,20 @@ define read-directory(p: &text): system(list(dirent)) {
   Right(output)
 }
 
+define get-directory-contents(dir-path: &text): system(list(text)) {
+  try items = read-directory(dir-path);
+  let items =
+    filter(items, function (i) {
+      tie Dirent of {name} = i;
+      and(ne-text(name, "."), ne-text(name, ".."))
+    });
+  Right(for-each(items, function (i) {
+    let Dirent of {name} = i;
+    pin name = name;
+    this.path.append(dir-path, name)
+  }))
+}
+
 foreign {
   neut_path_v0_1_is_regular_file(pointer): int,
   neut_path_v0_1_is_directory(pointer): int,
@@ -114,6 +130,24 @@ define create-directory<mode := 0o777>(t: &text): system(unit) {
   }
 }
 
+define get-modification-time<r := rho>(path: &text): system(time) {
+  let len = text-byte-length(path);
+  let buf = magic alloca(int8, add-int(len, 1));
+  _to-c-string-buf(path, len, buf);
+  let sec = magic alloca(int, 1);
+  let nsec = magic alloca(int, 1);
+  let result = magic external neut_path_v0_1_get_modification_time(buf, sec, nsec);
+  if lt-int(result, 0) {
+    try _ = r;
+    report-system-error()
+  } else {
+    let sec = load-int(sec);
+    let nsec = load-int(nsec);
+    try _ = r;
+    Right(Time of {seconds := sec, nanoseconds := nsec})
+  }
+}
+
 define test-zen(): system(unit) {
   try out = read-directory("/Users/");
   for(out, function (item) {
@@ -130,8 +164,13 @@ define test-zen(): system(unit) {
 }
 
 define zen(): unit {
-  pin r = create-directory("/Users/vekatze/Desktop/hey");
-  vet(r);
+  match get-modification-time("/Users/vekatze/Desktop/out.js") {
+  | Left(_) =>
+    Unit
+  | Right(t) =>
+    pin t = to-ISO8601-local(t, 8);
+    vet(t);
+  };
   pin b = is-regular-file("/usr/bin/xxd");
   vet(b);
   pin b = is-regular-file("/usr/bin/");

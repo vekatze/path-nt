@@ -32,5 +32,11 @@
         "https://github.com/vekatze/noa/raw/main/archive/0-4-9.tar.zst",
       ],
     },
+    time {
+      digest "8hl90H6PO9i83wOAKlPSrCPnzfYxDuFekw6O_iR5jA4",
+      mirror [
+        "https://github.com/vekatze/time-nt/raw/main/archive/0-4-43.tar.zst",
+      ],
+    },
   },
 }

@@ -63,3 +63,22 @@ int64_t neut_path_v0_1_is_directory(const char *path) {
 int64_t neut_path_v0_1_mkdir(const char *path, mode_t mode) {
   return (int64_t)mkdir(path, mode);
 }
+
+int64_t neut_path_v0_1_get_modification_time(const char *path, int64_t *sec,
+                                             int64_t *nsec) {
+  struct stat st;
+  if (stat(path, &st) != 0) {
+    return -1;
+  }
+
+  *sec = (int64_t)st.st_mtime;
+#if defined(__APPLE__)
+  *nsec = st.st_mtimespec.tv_nsec;
+#elif defined(st_mtim) ||                                                      \
+    (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200809L)
+  *nsec = st.st_mtim.tv_nsec;
+#else
+  *nsec = 0;
+#endif
+  return 0;
+}
