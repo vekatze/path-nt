@@ -3,7 +3,7 @@ import {
   core.c-size {c-size},
   core.c-string {c-string, from-c-string, to-c-string},
   core.control {discard},
-  core.list {filter, for, for-each},
+  core.list {filter, for, for-each, for-each-E},
   core.magic,
   core.memory {load-int, store-int8},
   core.pointer {null-pointer, shift},
@@ -12,7 +12,7 @@ import {
   core.text.io {print-line},
   this.entity.dirent {Dirent, dirent},
   this.entity.dirent.show {show-dirent},
-  this.entity.dtype {dtype-from-int},
+  this.entity.dtype {DT_DIR, DT_REG, dtype-from-int},
   this.path {drop-last},
   time.time {Time, time, to-ISO8601-local},
 }
@@ -26,6 +26,8 @@ foreign {
   neut_path_v0_1_GET_DTYPE(pointer): int8,
   neut_path_v0_1_mkdir(pointer, int): int,
   neut_path_v0_1_get_modification_time(pointer, pointer, pointer): int,
+  neut_path_v0_1_unlink(pointer): int,
+  neut_path_v0_1_rmdir(pointer): int,
 }
 
 data _directory {}
@@ -130,6 +132,54 @@ define create-directory<mode := 0o777>(t: &text): system(unit) {
   }
 }
 
+define unlink(path: &text): system(unit) {
+  let len = text-byte-length(path);
+  let buf = magic alloca(int8, add-int(len, 1));
+  _to-c-string-buf(path, len, buf);
+  let result = magic external neut_path_v0_1_unlink(buf);
+  if lt-int(result, 0) {
+    report-system-error()
+  } else {
+    Right(Unit)
+  }
+}
+
+define remove-empty-directory(path: &text): system(unit) {
+  let len = text-byte-length(path);
+  let buf = magic alloca(int8, add-int(len, 1));
+  _to-c-string-buf(path, len, buf);
+  let result = magic external neut_path_v0_1_rmdir(buf);
+  if lt-int(result, 0) {
+    report-system-error()
+  } else {
+    Right(Unit)
+  }
+}
+
+define remove-directory(dir-path: &text): system(unit) {
+  try children = read-directory(dir-path);
+  let _ =
+    for-each-E(children, function (c) {
+      let Dirent of {kind, name} = c;
+      pin name = name;
+      let should-skip = or(eq-text(name, "."), eq-text(name, ".."));
+      if should-skip {
+        Right(Unit)
+      } else {
+        pin target-path = this.path.append(dir-path, name);
+        match kind {
+        | DT_DIR =>
+          remove-directory(target-path)
+        | DT_REG =>
+          unlink(target-path)
+        | _ =>
+          Right(Unit)
+        }
+      }
+    });
+  remove-empty-directory(dir-path)
+}
+
 define get-modification-time<r := rho>(path: &text): system(time) {
   let len = text-byte-length(path);
   let buf = magic alloca(int8, add-int(len, 1));
@@ -171,6 +221,16 @@ define zen(): unit {
     pin t = to-ISO8601-local(t, 8);
     vet(t);
   };
+  pin result = read-directory("/Users/vekatze/Desktop/foo");
+  vet(result);
+  pin result = remove-directory("/Users/vekatze/Desktop/foo");
+  vet(result);
+  pin result = read-directory("/Users/vekatze/Desktop/foo");
+  vet(result);
+  pin result = unlink("/Users/vekatze/Desktop/out.js");
+  vet(result);
+  pin result = remove-empty-directory("/Users/vekatze/Desktop/dir");
+  vet(result);
   pin b = is-regular-file("/usr/bin/xxd");
   vet(b);
   pin b = is-regular-file("/usr/bin/");

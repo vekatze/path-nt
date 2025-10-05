@@ -1,6 +1,7 @@
 #include <dirent.h>
 #include <stdbool.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 __attribute__((always_inline)) char *
 neut_path_v0_1_GET_DNAME(struct dirent *d) {
@@ -81,4 +82,12 @@ int64_t neut_path_v0_1_get_modification_time(const char *path, int64_t *sec,
   *nsec = 0;
 #endif
   return 0;
+}
+
+int64_t neut_path_v0_1_unlink(const char *path) {
+  return (int64_t)unlink(path);
+}
+
+int64_t neut_path_v0_1_rmdir(const char *path) {
+  return (int64_t)rmdir(path);
 }
