@@ -55,23 +55,23 @@ define _clean-double-dots(components: list(text), acc: list(text)): list(text) {
 
 define clean(path: &text): text {
   let components = split(path, separator);
-  let components' =
+  let components =
     filter(components, function (component) {
       all(List[
         not(eq-text(component, "")),
         not(eq-text(component, ".")),
       ])
     });
-  let components' = _clean-double-dots(components', List[]);
+  let components = _clean-double-dots(components, List[]);
   if is-absolute(path) {
-    let len on components' = length(components');
+    let len on components = length(components);
     if eq-int(len, 0) {
       *separator
     } else {
-      intercalate(Cons(*"", components'), *separator)
+      intercalate(Cons(*"", components), *separator)
     }
   } else {
-    intercalate(components', *separator)
+    intercalate(components, *separator)
   }
 }
 

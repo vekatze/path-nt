@@ -37,7 +37,7 @@ define get-current-directory(): system(text) {
   if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
   } else {
-    pin cwd = core.magic.cast(pointer, c-string, result);
+    pin cwd = core.magic.cast<pointer, c-string>(result);
     Right(from-c-string(cwd))
   }
 }
@@ -49,7 +49,7 @@ define _open-directory(p: &text): system(_directory) {
   if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
   } else {
-    Right(core.magic.cast(pointer, _directory, result))
+    Right(core.magic.cast<pointer, _directory>(result))
   }
 }
 
@@ -120,7 +120,7 @@ inline is-directory(t: &text): bool {
   eq-int(magic external neut_path_v0_1_is_directory(buf), 1)
 }
 
-define create-directory<mode := 0o777>(t: &text): system(unit) {
+define create-directory(t: &text)[mode := 0o777]: system(unit) {
   let len = text-byte-length(t);
   let buf = magic alloca(int8, add-int(len, 1));
   _to-c-string-buf(t, len, buf);
@@ -180,7 +180,7 @@ define remove-directory(dir-path: &text): system(unit) {
   remove-empty-directory(dir-path)
 }
 
-define get-modification-time<r := rho>(path: &text): system(time) {
+define get-modification-time(path: &text)[r := rho]: system(time) {
   let len = text-byte-length(path);
   let buf = magic alloca(int8, add-int(len, 1));
   _to-c-string-buf(path, len, buf);
@@ -219,26 +219,26 @@ define zen(): unit {
     Unit
   | Right(t) =>
     pin t = to-ISO8601-local(t, 8);
-    vet(t);
+    vet::(t);
   };
   pin result = read-directory("/Users/vekatze/Desktop/foo");
-  vet(result);
+  vet::(result);
   pin result = remove-directory("/Users/vekatze/Desktop/foo");
-  vet(result);
+  vet::(result);
   pin result = read-directory("/Users/vekatze/Desktop/foo");
-  vet(result);
+  vet::(result);
   pin result = unlink("/Users/vekatze/Desktop/out.js");
-  vet(result);
+  vet::(result);
   pin result = remove-empty-directory("/Users/vekatze/Desktop/dir");
-  vet(result);
+  vet::(result);
   pin b = is-regular-file("/usr/bin/xxd");
-  vet(b);
+  vet::(b);
   pin b = is-regular-file("/usr/bin/");
-  vet(b);
+  vet::(b);
   pin b = is-directory("/etc");
-  vet(b);
+  vet::(b);
   pin b = is-directory("/etc/");
-  vet(b);
+  vet::(b);
   match test-zen() {
   | Left(e) =>
     pin e = get-error-message(e);

@@ -7,7 +7,7 @@ import {
 
 define main(): unit {
   pin k = make-default-noa-kit();
-  check(
+  check::(
     k,
     "∀ (p: path). clean(clean(p)) == clean(p)",
     paths,
@@ -18,7 +18,7 @@ define main(): unit {
       eq-text(p1, p2)
     },
   );
-  check(
+  check::(
     k,
     "∀ (p: path). is-absolute(p) <=> not(is-relative(p))",
     paths,
@@ -31,7 +31,7 @@ define main(): unit {
       }
     },
   );
-  check(
+  check::(
     k,
     "∀ (p: path). is-relative(p) <=> not(is-absolute(p))",
     paths,
@@ -44,37 +44,37 @@ define main(): unit {
       }
     },
   );
-  check(
+  check::(
     k,
     "∀ (p: path). is-absolute(p) <=> is-absolute(clean(p))",
     paths,
     function (p) {
       pin p = p;
       if is-absolute(p) {
-        pin p' = clean(p);
-        is-absolute(p')
+        pin p = clean(p);
+        is-absolute(p)
       } else {
-        pin p' = clean(p);
-        not(is-absolute(p'))
+        pin p = clean(p);
+        not(is-absolute(p))
       }
     },
   );
-  check(
+  check::(
     k,
     "∀ (p: path). is-relative(p) <=> is-relative(clean(p))",
     paths,
     function (p) {
       pin p = p;
       if is-relative(p) {
-        pin p' = clean(p);
-        is-relative(p')
+        pin p = clean(p);
+        is-relative(p)
       } else {
-        pin p' = clean(p);
-        not(is-relative(p'))
+        pin p = clean(p);
+        not(is-relative(p))
       }
     },
   );
-  check(
+  check::(
     k,
     "∀ (p: path). append(drop-last(p), take-last(p)) == clean(p)",
     paths,
@@ -82,12 +82,12 @@ define main(): unit {
       pin p = p;
       pin dir = drop-last(p);
       pin base = take-last(p);
-      pin p' = this.path.append(dir, base);
+      pin from-dir-base = this.path.append(dir, base);
       pin p1 = clean(p);
-      eq-text(p1, p')
+      eq-text(p1, from-dir-base)
     },
   );
-  check(
+  check::(
     k,
     "∀ (p: path). let Pair(base, ext) = split-extension(p) in clean(text-append(base, ext)) == clean(p)",
     paths,
@@ -96,9 +96,9 @@ define main(): unit {
       let Pair(init, last) = split-extension(p);
       pin init = init;
       pin last = last;
-      pin p' = core.text.append(init, last);
+      pin from-init-last = core.text.append(init, last);
       pin p1 = clean(p);
-      pin p2 = clean(p');
+      pin p2 = clean(from-init-last);
       eq-text(p1, p2)
     },
   )
