@@ -60,7 +60,7 @@ define _read-directory(d: _directory): list(dirent) {
   } else {
     let name = from-c-string(magic cast(pointer, &c-string, magic external neut_path_v0_1_GET_DNAME(result)));
     let kind = dtype-from-int(magic external neut_path_v0_1_GET_DTYPE(result));
-    Cons(Dirent of {kind, name}, _read-directory(d))
+    Cons(Dirent{kind, name}, _read-directory(d))
   }
 }
 
@@ -84,11 +84,11 @@ define get-directory-contents(dir-path: &text): system(list(text)) {
   try items = read-directory(dir-path);
   let items =
     filter(items, function (i) {
-      tie Dirent of {name} = i;
+      tie Dirent{name} = i;
       and(ne-text(name, "."), ne-text(name, ".."))
     });
   Right(for-each(items, function (i) {
-    let Dirent of {name} = i;
+    let Dirent{name} = i;
     pin name = name;
     this.path.append(dir-path, name)
   }))
@@ -160,7 +160,7 @@ define remove-directory(dir-path: &text): system(unit) {
   try children = read-directory(dir-path);
   let _ =
     for-each-E(children, function (c) {
-      let Dirent of {kind, name} = c;
+      let Dirent{kind, name} = c;
       pin name = name;
       let should-skip = or(eq-text(name, "."), eq-text(name, ".."));
       if should-skip {
@@ -194,7 +194,7 @@ define get-modification-time(path: &text)[r := rho]: system(time) {
     let sec = load-int(sec);
     let nsec = load-int(nsec);
     try _ = r;
-    Right(Time of {seconds := sec, nanoseconds := nsec})
+    Right(Time{seconds := sec, nanoseconds := nsec})
   }
 }
 
