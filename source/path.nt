@@ -12,11 +12,11 @@ import {
   core.text.eq {eq-suffix},
 }
 
-inline separator-rune: rune {
+constant separator-rune: rune {
   `/`
 }
 
-inline separator: &text {
+constant separator: &text {
   introspect operating-system {
   | linux =>
     "/"
@@ -25,16 +25,16 @@ inline separator: &text {
   }
 }
 
-define is-absolute(path: &text): bool {
+define is-absolute(path: &text) -> bool {
   pin head = take-N(path, 1);
   eq-text(head, separator)
 }
 
-define is-relative(path: &text): bool {
+define is-relative(path: &text) -> bool {
   not(is-absolute(path))
 }
 
-define _clean-double-dots(components: list(text), acc: list(text)): list(text) {
+define _clean-double-dots(components: list(text), acc: list(text)) -> list(text) {
   match components {
   | Nil =>
     reverse(acc)
@@ -53,7 +53,7 @@ define _clean-double-dots(components: list(text), acc: list(text)): list(text) {
   }
 }
 
-define clean(path: &text): text {
+define clean(path: &text) -> text {
   let components = split(path, separator);
   let components =
     filter(components, function (component) {
@@ -75,7 +75,7 @@ define clean(path: &text): text {
   }
 }
 
-define append(path1: &text, path2: &text): text {
+define append(path1: &text, path2: &text) -> text {
   if eq-text(path1, "") {
     *path2
   } else {
@@ -85,7 +85,7 @@ define append(path1: &text, path2: &text): text {
   }
 }
 
-define take-last(path: &text): text {
+define take-last(path: &text) -> text {
   // take-last("foo/") => ""
   // take-last("foo/bar") => "bar"
   // take-last("foobar") => "foobar"
@@ -98,7 +98,7 @@ define take-last(path: &text): text {
   clean(tmp)
 }
 
-define drop-last(path: &text): text {
+define drop-last(path: &text) -> text {
   // drop-last("foo/") => "foo"
   // drop-last("foo/bar") => "foo"
   // drop-last("foobar") => ""
@@ -111,7 +111,7 @@ define drop-last(path: &text): text {
   clean(tmp)
 }
 
-define _split-extension(path: &text, pivot: int): pair(text, text) {
+define _split-extension(path: &text, pivot: int) -> pair(text, text) {
   pin file = drop-end-N(path, pivot);
   let ext = take-end-N(path, pivot);
   if or(eq-suffix(file, "."), eq-suffix(file, "/")) {
@@ -121,7 +121,7 @@ define _split-extension(path: &text, pivot: int): pair(text, text) {
   }
 }
 
-define split-extension(path: &text): pair(text, text) {
+define split-extension(path: &text) -> pair(text, text) {
   let dot-pos-or-none =
     core.text.find-end(path, function (r) {
       eq-rune(r, `.`)

@@ -4,7 +4,7 @@ import {
   this.entity.dtype {DT_DIR},
 }
 
-define show-dirent(e: dirent): text {
+define show-dirent(e: dirent) -> text {
   let Dirent{kind, name} = e;
   match kind {
   | DT_DIR =>

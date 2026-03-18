@@ -5,7 +5,7 @@ import {
   this.path.gen {paths},
 }
 
-define main(): unit {
+define main() -> unit {
   pin k = make-default-noa-kit();
   check::(
     k,

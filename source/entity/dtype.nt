@@ -21,7 +21,7 @@ data dtype {
 | DT_UNKNOWN
 }
 
-define dtype-from-int(i: int8): dtype {
+define dtype-from-int(i: int8) -> dtype {
   if eq-int8(i, _DT_REG) {
     DT_REG
   } else-if eq-int8(i, _DT_DIR) {

@@ -32,7 +32,7 @@ foreign {
 
 data _directory {}
 
-define get-current-directory(): system(text) {
+define get-current-directory() -> system(text) {
   let result = magic external getcwd(null-pointer, 0);
   if eq-int(magic cast(pointer, int, result), 0) {
     report-system-error()
@@ -42,7 +42,7 @@ define get-current-directory(): system(text) {
   }
 }
 
-define _open-directory(p: &text): system(_directory) {
+define _open-directory(p: &text) -> system(_directory) {
   let c-str = to-c-string(p);
   let result on c-str = magic external opendir(magic cast(&c-string, pointer, c-str));
   discard(c-str);
@@ -53,7 +53,7 @@ define _open-directory(p: &text): system(_directory) {
   }
 }
 
-define _read-directory(d: _directory): list(dirent) {
+define _read-directory(d: _directory) -> list(dirent) {
   let result = magic external readdir(magic cast(_directory, pointer, d));
   if eq-int(magic cast(pointer, int, result), 0) {
     Nil
@@ -64,7 +64,7 @@ define _read-directory(d: _directory): list(dirent) {
   }
 }
 
-define _close-directory(d: _directory): system(unit) {
+define _close-directory(d: _directory) -> system(unit) {
   let result = magic external closedir(magic cast(_directory, pointer, d));
   if eq-int(from-c-int(result), -1) {
     report-system-error()
@@ -73,14 +73,14 @@ define _close-directory(d: _directory): system(unit) {
   }
 }
 
-define read-directory(p: &text): system(list(dirent)) {
+define read-directory(p: &text) -> system(list(dirent)) {
   try dir = _open-directory(p);
   let output = _read-directory(dir);
   try _ = _close-directory(dir);
   Right(output)
 }
 
-define get-directory-contents(dir-path: &text): system(list(text)) {
+define get-directory-contents(dir-path: &text) -> system(list(text)) {
   try items = read-directory(dir-path);
   let items =
     filter(items, function (i) {
@@ -100,27 +100,27 @@ foreign {
   llvm.memcpy.p0.p0.i64(pointer, pointer, int64, int1): void,
 }
 
-define _to-c-string-buf(t: &text, len: int, buf: pointer): unit {
+define _to-c-string-buf(t: &text, len: int, buf: pointer) -> unit {
   let src-ptr = core.text._get-content-pointer(t);
   let _ = magic external llvm.memcpy.p0.p0.i64(buf, src-ptr, len, 0);
   store-int8(0, shift(buf, len));
 }
 
-inline is-regular-file(t: &text): bool {
+inline is-regular-file(t: &text) -> bool {
   let len = text-byte-length(t);
   let buf = magic alloca(int8, add-int(len, 1));
   _to-c-string-buf(t, len, buf);
   eq-int(magic external neut_path_v0_1_is_regular_file(buf), 1)
 }
 
-inline is-directory(t: &text): bool {
+inline is-directory(t: &text) -> bool {
   let len = text-byte-length(t);
   let buf = magic alloca(int8, add-int(len, 1));
   _to-c-string-buf(t, len, buf);
   eq-int(magic external neut_path_v0_1_is_directory(buf), 1)
 }
 
-define create-directory(t: &text)[mode := 0o777]: system(unit) {
+define create-directory(t: &text)[mode := 0o777] -> system(unit) {
   let len = text-byte-length(t);
   let buf = magic alloca(int8, add-int(len, 1));
   _to-c-string-buf(t, len, buf);
@@ -132,7 +132,7 @@ define create-directory(t: &text)[mode := 0o777]: system(unit) {
   }
 }
 
-define unlink(path: &text): system(unit) {
+define unlink(path: &text) -> system(unit) {
   let len = text-byte-length(path);
   let buf = magic alloca(int8, add-int(len, 1));
   _to-c-string-buf(path, len, buf);
@@ -144,7 +144,7 @@ define unlink(path: &text): system(unit) {
   }
 }
 
-define remove-empty-directory(path: &text): system(unit) {
+define remove-empty-directory(path: &text) -> system(unit) {
   let len = text-byte-length(path);
   let buf = magic alloca(int8, add-int(len, 1));
   _to-c-string-buf(path, len, buf);
@@ -156,7 +156,7 @@ define remove-empty-directory(path: &text): system(unit) {
   }
 }
 
-define remove-directory(dir-path: &text): system(unit) {
+define remove-directory(dir-path: &text) -> system(unit) {
   try children = read-directory(dir-path);
   let _ =
     for-each-E(children, function (c) {
@@ -180,7 +180,7 @@ define remove-directory(dir-path: &text): system(unit) {
   remove-empty-directory(dir-path)
 }
 
-define get-modification-time(path: &text)[r := rho]: system(time) {
+define get-modification-time(path: &text)[r := rho] -> system(time) {
   let len = text-byte-length(path);
   let buf = magic alloca(int8, add-int(len, 1));
   _to-c-string-buf(path, len, buf);
@@ -198,7 +198,7 @@ define get-modification-time(path: &text)[r := rho]: system(time) {
   }
 }
 
-define test-zen(): system(unit) {
+define test-zen() -> system(unit) {
   try out = read-directory("/Users/");
   for(out, function (item) {
     pin t = show-dirent(item);
@@ -213,7 +213,7 @@ define test-zen(): system(unit) {
   Right(Unit)
 }
 
-define zen(): unit {
+define zen() -> unit {
   match get-modification-time("/Users/vekatze/Desktop/out.js") {
   | Left(_) =>
     Unit

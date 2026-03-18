@@ -7,7 +7,7 @@ import {
   this.path {separator},
 }
 
-inline path-components: gen(list(text)) {
+constant path-components: gen(list(text)) {
   list-gen(
     text-gen(
       Config{
@@ -24,7 +24,7 @@ inline path-components: gen(list(text)) {
   )
 }
 
-inline paths: gen(text) {
+constant paths: gen(text) {
   let Gen{generate, shrink} = path-components;
   Gen{
     generate := {
