@@ -56,7 +56,7 @@ define _clean-double-dots(components: list(text), acc: list(text)) -> list(text)
 define clean(path: &text) -> text {
   let components = split(path, separator);
   let components =
-    filter(components, function (component) {
+    filter(components, (component) => {
       all(List[
         not(eq-text(component, "")),
         not(eq-text(component, ".")),
@@ -92,7 +92,7 @@ define take-last(path: &text) -> text {
   // take-last("root/foo/") => ""
   // take-last("root/foo/bar") => "bar"
   pin tmp =
-    take-while-end-N(path, function (r) {
+    take-while-end-N(path, (r) => {
       ne-rune(r, separator-rune)
     });
   clean(tmp)
@@ -105,7 +105,7 @@ define drop-last(path: &text) -> text {
   // drop-last("root/foo/") => "root/foo"
   // drop-last("root/foo/bar") => "root/foo"
   pin tmp =
-    drop-while-end-N(path, function (r) {
+    drop-while-end-N(path, (r) => {
       ne-rune(r, separator-rune)
     });
   clean(tmp)
@@ -123,11 +123,11 @@ define _split-extension(path: &text, pivot: int) -> pair(text, text) {
 
 define split-extension(path: &text) -> pair(text, text) {
   let dot-pos-or-none =
-    core.text.find-end(path, function (r) {
+    core.text.find-end(path, (r) => {
       eq-rune(r, `.`)
     });
   let slash-pos-or-none =
-    core.text.find-end(path, function (r) {
+    core.text.find-end(path, (r) => {
       eq-rune(r, `/`)
     });
   match dot-pos-or-none {

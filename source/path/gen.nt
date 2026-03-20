@@ -10,12 +10,12 @@ import {
 constant path-components: gen(list(text)) {
   list-gen(
     text-gen(
-      Config{
+      Config {
         min-length := 0,
         max-length := none,
         rune-generator := none,
         rune-acceptor := {
-          function (r) {
+          (r) => {
             and(ne-rune(r, `/`), ne-rune(r, `\0`))
           }
         },
@@ -25,24 +25,24 @@ constant path-components: gen(list(text)) {
 }
 
 constant paths: gen(text) {
-  let Gen{generate, shrink} = path-components;
-  Gen{
+  let Gen {generate, shrink} = path-components;
+  Gen {
     generate := {
-      function (size) {
+      (size) => {
         let xs = generate(size);
         intercalate(xs, *separator)
       }
     },
     shrink := {
-      function (path) {
+      (path) => {
         pin path = path;
         let components = split(path, separator);
         let components-list = shrink(components);
         let cands =
-          for-each(components-list, function (components) {
+          for-each(components-list, (components) => {
             intercalate(components, *separator)
           });
-        filter(cands, function (cand) {
+        filter(cands, (cand) => {
           ne-text(path, cand)
         })
       }

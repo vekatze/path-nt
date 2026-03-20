@@ -11,7 +11,7 @@ define main() -> unit {
     k,
     "∀ (p: path). clean(clean(p)) == clean(p)",
     paths,
-    function (p) {
+    (p) => {
       pin p = p;
       pin p1 = clean(p);
       pin p2 = clean(p1);
@@ -22,7 +22,7 @@ define main() -> unit {
     k,
     "∀ (p: path). is-absolute(p) <=> not(is-relative(p))",
     paths,
-    function (p) {
+    (p) => {
       pin p = p;
       if is-absolute(p) {
         not(is-relative(p))
@@ -35,7 +35,7 @@ define main() -> unit {
     k,
     "∀ (p: path). is-relative(p) <=> not(is-absolute(p))",
     paths,
-    function (p) {
+    (p) => {
       pin p = p;
       if is-relative(p) {
         not(is-absolute(p))
@@ -48,7 +48,7 @@ define main() -> unit {
     k,
     "∀ (p: path). is-absolute(p) <=> is-absolute(clean(p))",
     paths,
-    function (p) {
+    (p) => {
       pin p = p;
       if is-absolute(p) {
         pin p = clean(p);
@@ -63,7 +63,7 @@ define main() -> unit {
     k,
     "∀ (p: path). is-relative(p) <=> is-relative(clean(p))",
     paths,
-    function (p) {
+    (p) => {
       pin p = p;
       if is-relative(p) {
         pin p = clean(p);
@@ -78,7 +78,7 @@ define main() -> unit {
     k,
     "∀ (p: path). append(drop-last(p), take-last(p)) == clean(p)",
     paths,
-    function (p) {
+    (p) => {
       pin p = p;
       pin dir = drop-last(p);
       pin base = take-last(p);
@@ -91,7 +91,7 @@ define main() -> unit {
     k,
     "∀ (p: path). let Pair(base, ext) = split-extension(p) in clean(text-append(base, ext)) == clean(p)",
     paths,
-    function (p) {
+    (p) => {
       pin p = p;
       let Pair(init, last) = split-extension(p);
       pin init = init;
