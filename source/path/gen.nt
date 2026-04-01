@@ -1,15 +1,15 @@
 import {
   core.list {filter, for-each},
-  core.text {intercalate, split},
+  core.string {intercalate, split},
   noa.gen {Gen, gen},
-  noa.gen.custom.text {Config, text-gen},
+  noa.gen.custom.string {Config, string-gen},
   noa.gen.list {list-gen},
   this.path {separator},
 }
 
-constant path-components: gen(list(text)) {
+constant path-components: gen(list(string)) {
   list-gen(
-    text-gen(
+    string-gen(
       Config {
         min-length := 0,
         max-length := none,
@@ -24,7 +24,7 @@ constant path-components: gen(list(text)) {
   )
 }
 
-constant paths: gen(text) {
+constant paths: gen(string) {
   let Gen {generate, shrink} = path-components;
   Gen {
     generate := {
@@ -43,7 +43,7 @@ constant paths: gen(text) {
             intercalate(components, *separator)
           });
         filter(cands, (cand) => {
-          ne-text(path, cand)
+          ne-string(path, cand)
         })
       }
     },

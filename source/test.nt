@@ -15,7 +15,7 @@ define main() -> unit {
       pin p = p;
       pin p1 = clean(p);
       pin p2 = clean(p1);
-      eq-text(p1, p2)
+      eq-string(p1, p2)
     },
   );
   check::(
@@ -84,22 +84,22 @@ define main() -> unit {
       pin base = take-last(p);
       pin from-dir-base = this.path.append(dir, base);
       pin p1 = clean(p);
-      eq-text(p1, from-dir-base)
+      eq-string(p1, from-dir-base)
     },
   );
   check::(
     k,
-    "∀ (p: path). let Pair(base, ext) = split-extension(p) in clean(text-append(base, ext)) == clean(p)",
+    "∀ (p: path). let Pair(base, ext) = split-extension(p) in clean(string-append(base, ext)) == clean(p)",
     paths,
     (p) => {
       pin p = p;
       let Pair(init, last) = split-extension(p);
       pin init = init;
       pin last = last;
-      pin from-init-last = core.text.append(init, last);
+      pin from-init-last = core.string.append(init, last);
       pin p1 = clean(p);
       pin p2 = clean(from-init-last);
-      eq-text(p1, p2)
+      eq-string(p1, p2)
     },
   )
 }

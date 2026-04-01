@@ -5,6 +5,6 @@ import {
 data dirent {
 | Dirent(
     kind: dtype,
-    name: text,
+    name: string,
   )
 }
