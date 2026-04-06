@@ -1,12 +1,12 @@
 foreign {
-  neut_path_v0_1_DT_BLK(): int8,
-  neut_path_v0_1_DT_CHR(): int8,
-  neut_path_v0_1_DT_DIR(): int8,
-  neut_path_v0_1_DT_FIFO(): int8,
-  neut_path_v0_1_DT_LNK(): int8,
-  neut_path_v0_1_DT_REG(): int8,
-  neut_path_v0_1_DT_SOCK(): int8,
-  neut_path_v0_1_DT_UNKNOWN(): int8,
+  neut_path_v0_1_DT_BLK() -> int8,
+  neut_path_v0_1_DT_CHR() -> int8,
+  neut_path_v0_1_DT_DIR() -> int8,
+  neut_path_v0_1_DT_FIFO() -> int8,
+  neut_path_v0_1_DT_LNK() -> int8,
+  neut_path_v0_1_DT_REG() -> int8,
+  neut_path_v0_1_DT_SOCK() -> int8,
+  neut_path_v0_1_DT_UNKNOWN() -> int8,
 }
 
 constant _DT_BLK: int8 {

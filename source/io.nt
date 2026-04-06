@@ -18,16 +18,16 @@ import {
 }
 
 foreign {
-  getcwd(pointer, c-size): pointer,
-  opendir(pointer): pointer,
-  readdir(pointer): pointer,
-  closedir(pointer): c-int,
-  neut_path_v0_1_GET_DNAME(pointer): pointer,
-  neut_path_v0_1_GET_DTYPE(pointer): int8,
-  neut_path_v0_1_mkdir(pointer, int): int,
-  neut_path_v0_1_get_modification_time(pointer, pointer, pointer): int,
-  neut_path_v0_1_unlink(pointer): int,
-  neut_path_v0_1_rmdir(pointer): int,
+  getcwd(pointer, c-size) -> pointer,
+  opendir(pointer) -> pointer,
+  readdir(pointer) -> pointer,
+  closedir(pointer) -> c-int,
+  neut_path_v0_1_GET_DNAME(pointer) -> pointer,
+  neut_path_v0_1_GET_DTYPE(pointer) -> int8,
+  neut_path_v0_1_mkdir(pointer, int) -> int,
+  neut_path_v0_1_get_modification_time(pointer, pointer, pointer) -> int,
+  neut_path_v0_1_unlink(pointer) -> int,
+  neut_path_v0_1_rmdir(pointer) -> int,
 }
 
 data _directory {}
@@ -95,9 +95,9 @@ define get-directory-contents(dir-path: &string) -> system(list(string)) {
 }
 
 foreign {
-  neut_path_v0_1_is_regular_file(pointer): int,
-  neut_path_v0_1_is_directory(pointer): int,
-  llvm.memcpy.p0.p0.i64(pointer, pointer, int64, int1): void,
+  neut_path_v0_1_is_regular_file(pointer) -> int,
+  neut_path_v0_1_is_directory(pointer) -> int,
+  llvm.memcpy.p0.p0.i64(pointer, pointer, int64, int1) -> void,
 }
 
 define _to-c-string-buf(t: &string, len: int, buf: pointer) -> unit {
