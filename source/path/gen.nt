@@ -10,7 +10,7 @@ import {
 constant path-components: gen(list(string)) {
   list-gen(
     string-gen(
-      Config {
+      Config{
         min-length := 0,
         max-length := none,
         rune-generator := none,
@@ -25,8 +25,8 @@ constant path-components: gen(list(string)) {
 }
 
 constant paths: gen(string) {
-  let Gen {generate, shrink} = path-components;
-  Gen {
+  let Gen{generate, shrink} = path-components;
+  Gen{
     generate := {
       (size) => {
         let xs = generate(size);
